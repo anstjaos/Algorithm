@@ -1,57 +1,56 @@
-#include <iostream>
+#include <cstdio>
 #include <algorithm>
-using namespace std;
-
+#define MAX_SIZE 1000001
 typedef struct {
+	int value;
 	int index;
-	int num;
-}Segment;
-int N, input, height, arr[400005];
-Segment segArr[200005];
+}Node;
+
+Node nodeArr[MAX_SIZE];
+int N, height, segTree[MAX_SIZE *4 + 1];
 
 int max(int a, int b) { return (a > b ? a : b); }
 
-bool comp(Segment& a, Segment& b)
+bool cmp(const Node& a, const Node& b)
 {
-	if (a.num == b.num)
+	if (a.value == b.value) return a.index > b.index;
+	return a.value < b.value;
+}
+
+int query(int left, int right, int nodeNum, int curLeft, int curRight)
+{
+	if (right < curLeft || curRight < left) return 0;
+	if (left <= curLeft && curRight <= right) return segTree[nodeNum];
+
+	int mid = (curLeft + curRight) / 2;
+	return max(query(left, right, nodeNum * 2, curLeft, mid), query(left, right, nodeNum * 2 + 1, mid + 1, curRight));
+}
+
+void update(int index)
+{
+	while (index > 1)
 	{
-		return a.index > b.index;
+		index /= 2;
+		segTree[index] = max(segTree[index * 2], segTree[index * 2 + 1]);
 	}
-	
-	return a.num < b.num;
 }
 
 int main()
 {
 	scanf("%d", &N);
 	while ((1 << height) < N) height++;
-
-	for (register int i = 0; i < N; i++) {
-		scanf("%d", &input);
-		segArr[i].index = i;
-		segArr[i].num = input;
-	}
-	sort(segArr, segArr + N, comp);
-
 	for (register int i = 0; i < N; i++)
 	{
-		int index = segArr[i].index;
-		int maxNum = 0;
-		for (register int j = (1 << height); j < (1 << height) + index; j++)
-		{
-			maxNum = max(maxNum, arr[j]);
-		}
-		arr[(1 << height) + index] = maxNum + 1;
+		scanf("%d", &nodeArr[i].value);
+		nodeArr[i].index = i;
 	}
 
-	for (register int i = height - 1; i >= 0; i--)
+	std::sort(nodeArr, nodeArr + N, cmp);
+	for (register int i = 0; i < N; i++)
 	{
-		for (register int j = (1 << i); j < 1 << (i + 1); j++)
-		{
-			arr[j] = max(arr[j * 2],arr[j * 2 + 1]);
-		}
+		segTree[(1 << height) + nodeArr[i].index] = query(0, nodeArr[i].index, 1, 0, (1<< height)-1) + 1;
+		update((1 << height) + nodeArr[i].index);
 	}
-
-	printf("%d\n", arr[1]);
+	printf("%d\n", segTree[1]);
 	return 0;
 }
