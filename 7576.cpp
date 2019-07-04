@@ -42,7 +42,7 @@ bool checkTomato()
 	return true;
 }
 
-void bfs()
+int bfs()
 {
 	front = rear = -1;
 	for (int i = 0; i < row; i++)
@@ -51,7 +51,7 @@ void bfs()
 		{
 			if (tomato[i][j] == 1)
 			{
-				push({ i,j});
+				push({ i,j });
 				visit[i][j] = 0;
 			}
 			else visit[i][j] = -1;
@@ -60,26 +60,40 @@ void bfs()
 
 	int nextX, nextY;
 	mv cur;
+	int days = -1;
 	while (front != rear)
 	{
-		cur = getFront();
-		pop();
-		
-		for (int i = 0; i < 4; i++)
+		int size = (rear - front + 1000001) % 1000001;
+		for (register int d = 0; d < size; d++)
 		{
-			nextX = cur.x + dirX[i];
-			nextY = cur.y + dirY[i];
+			cur = getFront();
+			pop();
 
-			if (nextX < 0 || nextY < 0 || nextX >= row || nextY >= col) continue;
-
-			if (tomato[nextX][nextY] == 0)
+			for (int i = 0; i < 4; i++)
 			{
-				tomato[nextX][nextY] = 1;
-				visit[nextX][nextY] = visit[cur.x][cur.y] + 1;
-				push({ nextX, nextY });
+				nextX = cur.x + dirX[i];
+				nextY = cur.y + dirY[i];
+
+				if (nextX < 0 || nextY < 0 || nextX >= row || nextY >= col) continue;
+
+				if (tomato[nextX][nextY] == 0)
+				{
+					tomato[nextX][nextY] = 1;
+					visit[nextX][nextY] = visit[cur.x][cur.y] + 1;
+					push({ nextX, nextY });
+				}
 			}
 		}
+		days++;
 	}
+
+	for (register int i = 0; i < row; i++)
+	{
+		for (register int j = 0; j < col; j++) {
+			if (tomato[i][j] == 0) return -1;
+		}
+	}
+	return days;
 }
 
 
@@ -91,20 +105,8 @@ int main()
 		for (int j = 0; j < col; j++) cin >> tomato[i][j];
 	}
 
-	bfs();
-	for (int i = 0; i < row; i++)
-	{
-		for (int j = 0; j < col; j++)
-		{
-			if (tomato[i][j] == 0)
-			{
-				cout << -1 << endl;
-				return 0;
-			}
-			
-			if (visit[i][j] > result) result = visit[i][j];
-		}
-	}
+	result = bfs();
+
 	cout << result << endl;
 	return 0;
 }

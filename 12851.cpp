@@ -1,119 +1,85 @@
-#include <iostream>
+#include<cstdio>
+#include <queue>
 using namespace std;
 
 typedef struct {
-	int cnt, visitCnt;
-}inform;
+	int cur;
+	int cnt;
+}Pos;
 
-inform dp[200001];
-bool visit[200001];
-int queue[1000001], front, rear, start, desti;
-
-void push(int index)
-{
-	rear = (rear + 1) % 1000001;
-	queue[rear] = index;
-}
-
-void pop()
-{
-	front = (front + 1) % 1000001;
-}
-
-int getFront()
-{
-	int temp = (front + 1) % 1000001;
-	return queue[temp];
-}
+int N, K, result, cnt;
+int visit[100005];
 
 void bfs()
 {
-	front = rear = -1;
-	push(start);
-	int cur;
+	queue<Pos> q;
+	q.push({ N, 0 });
+	visit[N] = true;
 
-	while (front != rear)
+	while (!q.empty())
 	{
-		cur = getFront();
-		pop();
+		Pos cur = q.front();
+		q.pop();
 
-		if (visit[cur] == true) continue;
-
-		visit[cur] = true;
-		if (cur == desti) continue;
-
-		if (cur > desti)
-		{
-			if (dp[cur - 1].cnt == 0 || dp[cur - 1].cnt > dp[cur].cnt + 1)
-			{
-				dp[cur - 1].visitCnt = dp[cur].visitCnt;
-
-				dp[cur - 1].cnt = dp[cur].cnt + 1;
-				push(cur - 1);
+		int nextX = cur.cur - 1;
+		if (nextX == K) {
+			if (cur.cnt + 1 < result) {
+				result = cur.cnt + 1;
+				cnt = 1;
 			}
-			else if (dp[cur - 1].cnt == dp[cur].cnt + 1)
-			{
-				dp[cur - 1].visitCnt++;
-				push(cur - 1);
-			}
+			else if (cur.cnt + 1 == result) cnt++;
 		}
-		else
-		{
-			if (cur + 1 <= desti && cur + 1 != start)
-			{
-				if (dp[cur + 1].cnt == 0 || dp[cur + 1].cnt > dp[cur].cnt + 1)
-				{
-					dp[cur + 1].visitCnt = dp[cur].visitCnt;
-					dp[cur + 1].cnt = dp[cur].cnt + 1;
-
-					push(cur + 1);
-				}
-				else if (dp[cur + 1].cnt == dp[cur].cnt + 1)
-				{
-					dp[cur + 1].visitCnt++;
-					push(cur + 1);
-				}
-			}
-			if (cur * 2 <= desti && cur * 2 != start)
-			{
-				if (dp[cur * 2].cnt == 0 || dp[cur * 2].cnt > dp[cur].cnt + 1)
-				{
-					dp[cur * 2].visitCnt = dp[cur].visitCnt;
-					dp[cur * 2].cnt = dp[cur].cnt + 1;
-
-					push(cur * 2);
-				}
-				else if (dp[cur * 2].cnt == dp[cur].cnt + 1)
-				{
-					dp[cur * 2].visitCnt++;
-					push(cur * 2);
-				}
-			}
-			if (cur - 1 >= 0 && cur - 1 != start)
-			{
-				if (dp[cur - 1].cnt == 0 || dp[cur - 1].cnt > dp[cur].cnt + 1)
-				{
-					dp[cur - 1].visitCnt = dp[cur].visitCnt;
-
-					dp[cur - 1].cnt = dp[cur].cnt + 1;
-
-					push(cur - 1);
-				}
-				else if (dp[cur - 1].cnt == dp[cur].cnt + 1)
-				{
-					dp[cur - 1].visitCnt++;
-					push(cur - 1);
-				}
-			}
+		else if (nextX >= 0 && (visit[nextX] == 0 || visit[nextX] >= cur.cnt+1)) {
+			visit[nextX] = cur.cnt+1;
+			q.push({ nextX, cur.cnt + 1 });
 		}
 
+		nextX = cur.cur + 1;
+		if (nextX == K) {
+			if (cur.cnt + 1 < result) {
+				result = cur.cnt + 1;
+				cnt = 1;
+			}
+			else if (cur.cnt + 1 == result) cnt++;
+		}
+		else if (nextX < 100001 && (visit[nextX] == 0 || visit[nextX] >= cur.cnt + 1)) {
+			visit[nextX] = cur.cnt+1;
+			q.push({ nextX, cur.cnt + 1 });
+		}
+
+		nextX = cur.cur * 2;
+		if (nextX == K) {
+			if (cur.cnt + 1 < result) {
+				result = cur.cnt + 1;
+				cnt = 1;
+			}
+			else if (cur.cnt + 1 == result) cnt++;
+		}
+		else if (nextX > K) {
+			if (nextX - K + cur.cnt + 1 < result) {
+				result = nextX - K + cur.cnt + 1;
+				cnt = 1;
+			}
+			else if (nextX - K + cur.cnt + 1 == result) cnt++;
+		}
+		else if (nextX < 100001 && (visit[nextX] == 0 || visit[nextX] >= cur.cnt + 1)) {
+			visit[nextX] = cur.cnt+1;
+			q.push({ nextX, cur.cnt + 1 });
+		}
 	}
 }
+
 int main()
 {
-	cin >> start >> desti;
-	dp[start].visitCnt = 1;
-	bfs();
-	cout << dp[desti].cnt << '\n' << dp[desti].visitCnt << '\n';
+	scanf("%d %d", &N, &K);
+	result = 2123456789;
+
+	if (N == K)
+	{
+		result = 0;
+		cnt = 1;
+	}
+	else bfs();
+	printf("%d\n%d\n", result, cnt);
 	return 0;
 }

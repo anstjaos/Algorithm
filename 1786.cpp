@@ -6,8 +6,8 @@ char text[1000001];
 int pi[1000001];
 int patternLen = 0;
 int textLen = 0;
-int rStart, rSize;
-int result[1000001], resultSize;
+
+int result[1000001], resultSize, cnt[26];
 
 int strLen(char *str)
 {
@@ -35,10 +35,9 @@ int main()
 
 	textLen = strLen(text);
 	patternLen = strLen(pattern);
-	rStart = 0;
-	rSize = 0;
+
 	resultSize = 0;
-	
+
 	getPi();
 
 	bool flag = false;
@@ -56,7 +55,7 @@ int main()
 			}
 			else j++;
 		}
-		
+
 	}
 
 	printf("%d\n", resultSize);
