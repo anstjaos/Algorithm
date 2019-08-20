@@ -1,26 +1,23 @@
-#include <cstdio>
+#include <stdio.h>
 
-int N, cnt, arr[10];
+int M, N, arr[10];
 bool check[10];
 
-void solve(int cur)
+void solve(int depth)
 {
-	if (cur == cnt)
-	{
-		for (register int i = 0; i < cnt; i++)
-		{
+	if (depth == N) {
+		for (register int i = 0; i < N; i++) {
 			printf("%d ", arr[i]);
 		}
 		printf("\n");
 		return;
 	}
 
-	for (register int i = 1; i <= N; i++)
-	{
+	for (register int i = 1; i <= M; i++) {
 		if (!check[i]) {
 			check[i] = true;
-			arr[cur] = i;
-			solve(cur + 1);
+			arr[depth] = i;
+			solve(depth + 1);
 			check[i] = false;
 		}
 	}
@@ -28,7 +25,7 @@ void solve(int cur)
 
 int main()
 {
-	scanf("%d %d", &N, &cnt);
+	scanf("%d %d", &M, &N);
 	solve(0);
 	return 0;
 }

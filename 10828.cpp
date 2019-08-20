@@ -1,51 +1,59 @@
-#include <iostream>
-#include <string>
-using namespace std;
+#include <stdio.h>
 
-int stack[100001];
-int top = -1;
+int stack[10005], top = -1, N;
+char input[10];
+
+bool strCmp(const char *s, const char* s1)
+{
+	int idx = 0;
+	while (s[idx] == s1[idx]) {
+		if (s[idx] == '\0') break;
+		idx++;
+	}
+
+	if (s[idx] == '\0' && s1[idx] == '\0') return true;
+	return false;
+}
+
+void push(int item)
+{
+	stack[++top] = item;
+}
+
+int pop()
+{
+	return stack[top--];
+}
+
+bool isEmpty()
+{
+	return top == -1;
+}
 
 int main()
 {
-	int test;
-	cin >> test;
+	scanf("%d", &N);
+	for (register int i = 0; i < N; i++) {
+		scanf("%s", input);
 
-	for (int i = 0; i < test; i++)
-	{
-		string input;
-		cin >> input;
-
-		if (input == "push")
-		{
+		if (strCmp(input, "push")) {
 			int num;
-			cin >> num;
-			stack[++top] = num;
+			scanf("%d", &num);
+			push(num);
 		}
-		else if (input == "pop")
-		{
-			if (top == -1)
-			{
-				cout << "-1" << endl;
-			}
-			else
-			{
-				int num = stack[top--];
-				cout << num << endl;
-			}
+		else if (strCmp(input, "pop")) {
+			if (isEmpty()) printf("-1\n");
+			else printf("%d\n", pop());
 		}
-		else if (input == "size")
-		{
-			cout << top + 1 << endl;
+		else if (strCmp(input, "empty")) {
+			isEmpty() == true ? printf("1\n") : printf("0\n");
 		}
-		else if (input == "empty")
-		{
-			if (top == -1) cout << "1" << endl;
-			else cout << "0" << endl;
+		else if (strCmp(input, "size")) {
+			printf("%d\n", top + 1);
 		}
-		else if (input == "top")
-		{
-			if (top == -1) cout << "-1" << endl;
-			else cout << stack[top] << endl;
+		else if (strCmp(input, "top")) {
+			if (isEmpty()) printf("-1\n");
+			printf("%d\n", stack[top]);
 		}
 	}
 	return 0;
