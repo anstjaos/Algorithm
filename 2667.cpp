@@ -1,133 +1,104 @@
-#include <iostream>
-using namespace std;
+#include <stdio.h>
+#define	QUEUE_SIZE 1000
 
 typedef struct {
 	int x;
 	int y;
-}loc;
+}Loc;
 
-char map[27][27];
-bool check[27][27];
-loc queue[1000001];
-int front, rear;
-int mapSize;
-int arr[3000];
-int arrCnt;
-int dirX[4] = { -1,0,1,0 };
-int dirY[4] = { 0,1,0,-1 };
+int N, arr[30][30], dirX[4] = { -1,0,1,0 }, dirY[4] = { 0,1,0,-1 };
+Loc queue[QUEUE_SIZE];
+int front, rear, check[30];
+bool visit[30][30];
 
-bool isEmpty()
-{
-	if (front == rear) return true;
-	else return false;
-}
-
-void push(loc item)
+void push(Loc item)
 {
 	queue[++rear] = item;
 }
 
-void pop()
+Loc pop()
 {
-	front++;
+	return queue[++front];
 }
 
-loc getFront()
-{
-	return queue[front + 1];
-}
-
-void init()
+int bfs(Loc start)
 {
 	front = rear = -1;
-	arrCnt = 0;
-
-	cin >> mapSize;
-	for (int i = 0; i <= mapSize +1; i++)
+	int ret = 0;
+	visit[start.x][start.y] = true;
+	push(start);
+	
+	while (front != rear)
 	{
-		map[0][i] = '0';
-		map[i][0] = '0';
-		map[mapSize+1][i] = '0';
-		map[i][mapSize+1] = '0';
-	}
+		Loc cur = pop();
+		ret++;
 
-	for (int i = 1; i <= mapSize; i++)
-	{
-		for (int j = 1; j <= mapSize; j++) cin >> map[i][j];
-	}
-}
+		for (register int i = 0; i < 4; i++) {
+			int nextX = cur.x + dirX[i];
+			int nextY = cur.y + dirY[i];
 
-int bfs(int x, int y)
-{
-	loc temp;
-	temp.x = x;
-	temp.y = y;
-	check[x][y] = true;
-	push(temp);
-	int cnt = 1;
-	while (!isEmpty())
-	{
-		temp = getFront();
-		pop();
+			if (nextX < 0 || nextY < 0 || nextX >= N || nextY >= N) continue;
+			if (arr[nextX][nextY] == 0 || visit[nextX][nextY]) continue;
 
-		for (int i = 0; i < 4; i++)
-		{
-			int nextX = temp.x + dirX[i];
-			int nextY = temp.y + dirY[i];
-
-			if (map[nextX][nextY] == '1' && check[nextX][nextY] == false)
-			{
-				check[nextX][nextY] = true;
-				loc item;
-				item.x = nextX;
-				item.y = nextY;
-				push(item);
-				cnt++;
-			}
+			visit[nextX][nextY] = true;
+			push({ nextX, nextY });
 		}
 	}
-	return cnt;
+
+	return ret;
 }
 
-void quickSort(int left, int right)
+void quickSort(int *a, const int left, const int right)
 {
 	int leftIndex = left;
 	int rightIndex = right;
-	int pivot = arr[(left + right) / 2];
+	int pivot = a[(left + right) / 2];
 
 	while (leftIndex <= rightIndex)
 	{
-		while (arr[leftIndex] < pivot) leftIndex++;
-		while (arr[rightIndex] > pivot) rightIndex--;
+		while (a[leftIndex] < pivot) {
+			if (leftIndex == right) break;
+			leftIndex++;
+		}
+		while (a[rightIndex] > pivot) {
+			if (rightIndex == left) break;
+			rightIndex--;
+		}
 
 		if (leftIndex <= rightIndex)
 		{
-			swap(arr[leftIndex], arr[rightIndex]);
+			int temp = a[leftIndex];
+			a[leftIndex] = a[rightIndex];
+			a[rightIndex] = temp;
+
 			leftIndex++;
 			rightIndex--;
 		}
 	}
 
-	if (left < rightIndex) quickSort(left, rightIndex);
-	if (leftIndex < right) quickSort(leftIndex, right);
+	if (leftIndex < right) quickSort(a, leftIndex, right);
+	if (left < rightIndex) quickSort(a, left, rightIndex);
 }
+
 int main()
 {
-	init();
-	int result;
-	for (int i = 1; i <= mapSize; i++)
-	{
-		for (int j = 1; j <= mapSize; j++)
-		{
-			if (map[i][j] == '1' && check[i][j] == false)
-			{
-				result = bfs(i, j);
-				arr[arrCnt] = result;
-				arrCnt++;
+	scanf("%d", &N);
+	for (register int i = 0; i < N; i++) {
+		for (register int j = 0; j < N; j++) scanf("%1d", &arr[i][j]);
+	}
+
+	int cnt = 0;
+	for (register int i = 0; i < N; i++) {
+		for (register int j = 0; j < N; j++) {
+			if (!visit[i][j] && arr[i][j] == 1) {
+				check[cnt] = bfs({ i,j });
+				cnt++;
 			}
 		}
 	}
-	quickSort(0, arrCnt - 1);
-	cout << arrCnt << endl;
-	for (int i = 0; i < arrCnt; i++) cout << arr[i] << endl;
+
+	quickSort(check, 0, cnt - 1);
+	printf("%d\n", cnt);
+	for (register int i = 0; i < cnt; i++) printf("%d\n", check[i]);
+	return 0;
 }

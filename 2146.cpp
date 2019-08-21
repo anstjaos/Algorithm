@@ -1,5 +1,4 @@
-#include <iostream>
-using namespace std;
+#include <stdio.h>
 
 typedef struct {
 	int x, y;
@@ -20,6 +19,7 @@ void push(mv item)
 }
 
 void pop() { front = (front + 1) % 1000001; }
+
 mv getFront()
 {
 	int temp = (front + 1) % 1000001;
@@ -39,7 +39,7 @@ void island(int x, int y, int num)
 		pop();
 		
 
-		for (int i = 0; i < 4; i++)
+		for (register int i = 0; i < 4; i++)
 		{
 			int nextX = cur.x + dirX[i];
 			int nextY = cur.y + dirY[i];
@@ -59,18 +59,18 @@ void island(int x, int y, int num)
 void bfs(int num)
 {
 	front = rear = -1;
-	for (int i = 0; i < mapSize; i++)
+	for (register int i = 0; i < mapSize; i++)
 	{
-		for (int j = 0; j < mapSize; j++)
+		for (register int j = 0; j < mapSize; j++)
 		{
 			bridge[i][j] = 0;
 			visit[i][j] = false;
 		}
 	}
 
-	for (int i = 0; i < mapSize; i++)
+	for (register int i = 0; i < mapSize; i++)
 	{
-		for (int j = 0; j < mapSize; j++)
+		for (register int j = 0; j < mapSize; j++)
 		{
 			if (map[i][j] == num)
 			{
@@ -90,7 +90,7 @@ void bfs(int num)
 		if (visit[cur.x][cur.y] == true) continue;
 
 		visit[cur.x][cur.y] = true;
-		for (int i = 0; i < 4; i++)
+		for (register int i = 0; i < 4; i++)
 		{
 			nextX = cur.x + dirX[i];
 			nextY = cur.y + dirY[i];
@@ -113,17 +113,17 @@ void bfs(int num)
 
 int main()
 {
-	cin >> mapSize;
+	scanf("%d", &mapSize);
 
-	for (int i = 0; i < mapSize; i++)
+	for (register int i = 0; i < mapSize; i++)
 	{
-		for (int j = 0; j < mapSize; j++) cin >> map[i][j];
+		for (register int j = 0; j < mapSize; j++) scanf("%d", &map[i][j]);
 	}
 
 	int num = 2;
-	for (int i = 0; i < mapSize; i++)
+	for (register int i = 0; i < mapSize; i++)
 	{
-		for (int j = 0; j < mapSize; j++)
+		for (register int j = 0; j < mapSize; j++)
 		{
 			if (map[i][j] == 1)
 			{
@@ -133,8 +133,8 @@ int main()
 		}
 	}
 
-	for (int i = 2; i < num; i++) bfs(i);
+	for (register int i = 2; i < num; i++) bfs(i);
 
-	cout << minNum << endl;
+	printf("%d\n", minNum);
 	return 0;
 }

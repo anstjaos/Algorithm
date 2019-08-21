@@ -1,47 +1,55 @@
-#include <iostream>
-using namespace std;
+#include <stdio.h>
+#define MAX_SIZE 100005
 
-int map[1001][1001];
-bool visit[1001];
-int edgeCnt, vertexCnt;
-int from, to;
-int result = 0;
+int N, M, map[1005][1005];
+int queue[MAX_SIZE], front, rear;
+bool visit[1005];
 
-void DFS(int start)
+void push(int item)
 {
+	queue[++rear] = item;
+}
+
+int pop()
+{
+	return queue[++front];
+}
+
+void bfs(int start)
+{
+	front = rear = -1;
+	push(start);
 	visit[start] = true;
 
-	for (int i = 1; i <= edgeCnt; i++)
+	while (front != rear)
 	{
-		if (map[start][i] == 1 && visit[i] == false)
-		{
-			DFS(i);
+		int cur = pop();
+		for (register int i = 1; i <= N; i++) {
+			if (map[cur][i] == 1 && !visit[i]) {
+				visit[i] = true;
+				push(i);
+			}
 		}
 	}
 }
 
 int main()
 {
-	cin >> edgeCnt >> vertexCnt;
-
-	for (int i = 0; i < vertexCnt; i++)
-	{
-		cin >> from >> to;
-		map[from][to] = 1;
-		map[to][from] = 1;
+	scanf("%d %d", &N, &M);
+	int a, b;
+	for (register int i = 0; i < M; i++) {
+		scanf("%d %d", &a, &b);
+		map[a][b] = 1;
+		map[b][a] = 1;
 	}
 
-	for (int i = 1; i <= edgeCnt; i++)
-	{
-		if (visit[i] == false)
-		{
-			DFS(i);
-			result++;
+	int cnt = 0;
+	for (register int i = 1; i <= N; i++) {
+		if (!visit[i]) {
+			bfs(i);
+			cnt++;
 		}
 	}
-
-	for (int i = 1; i <= edgeCnt; i++) if (visit[i] == false) result++;
-
-	cout << result << '\n';
+	printf("%d\n", cnt);
 	return 0;
 }

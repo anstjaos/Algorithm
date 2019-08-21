@@ -1,88 +1,65 @@
-#include <iostream>
-using namespace std;
+#include <stdio.h>
+#define MAX_SIZE 100005
+#define INF 2123456789
 
-typedef struct m
+typedef struct {
+	int x;
+	int y;
+}Location;
+int row, col, map[105][105], cost[105][105];
+Location queue[MAX_SIZE];
+int front, rear;
+int dirX[4] = { -1,0,1,0 }, dirY[4] = { 0,1,0,-1 };
+
+void push(Location item)
 {
-	int row;
-	int col;
-	int dir;
-}m;
+	rear = (rear + 1) % MAX_SIZE;
+	queue[rear] = item;
+}
 
-enum {N=0,E,S,W};
-m mv[4];
-char maze[101][101];
-
-int init()
+Location pop()
 {
-	mv[N].row = -1;
-	mv[N].col = 0;
+	front = (front + 1) % MAX_SIZE;
+	return queue[front];
+}
 
-	mv[E].row = 0;
-	mv[E].col = 1;
+void bfs()
+{
+	front = rear = -1;
+	cost[0][0] = 1;
+	push({ 0,0 });
 
-	mv[S].row = 1;
-	mv[S].col = 0;
+	while (front != rear)
+	{
+		Location cur = pop();
 
-	mv[W].row = 0;
-	mv[W].col = -1;
+		for (register int i = 0; i < 4; i++)
+		{
+			int nextX = cur.x + dirX[i];
+			int nextY = cur.y + dirY[i];
+
+			if (nextX < 0 || nextY < 0 || nextX >= row || nextY >= col) continue;
+			if (map[nextX][nextY] == 0) continue;
+
+			if (cost[nextX][nextY] > cost[cur.x][cur.y] + 1) {
+				cost[nextX][nextY] = cost[cur.x][cur.y] + 1;
+				push({ nextX, nextY });
+			}
+		}
+	}
 }
 
 int main()
 {
-	int cnt = 1;
-	int row, col;
-	m cur;
-	init();
-	m stack[101];
-	int top = 0;
-	cin >> row, col;
-	char mark[101][101] = { 0, };
-	for (int i = 0; i <= row+1; i++)
-	{
-		maze[i][0] = 0;
-		maze[i][col+1] = 0;
-	}
-	for (int j = 0; j <= col+1; j++)
-	{
-		maze[0][j] = 0;
-		maze[row + 1][j] = 0;
-	}
-	for (int i = 1; i < row + 1; i++)
-	{
-		for (int j = 1; j < col + 1; j++)
-		{
-			cin >> maze[i][j];
+	scanf("%d %d", &row, &col);
+	for (register int i = 0; i < row; i++) {
+		for (register int j = 0; j < col; j++) {
+			scanf("%1d", &map[i][j]);
+			cost[i][j] = INF;
 		}
 	}
-	
-	cur = { 1, 1, N };
-	bool flag = false;
-	while (1)
-	{
-		int nextD = cur.dir + 1;
-		int nextX = cur.row + mv[nextD].row;
-		int nextY = cur.col + mv[nextD].col;
 
-		for(int i = 0; i < 4 ; i++)
-		{
-			int nextD = cur.dir + 1;
-			int nextX = cur.row + mv[i].row;
-			int nextY = cur.col + mv[i].col;
-
-			if (nextX == row && nextY == col)
-			{
-				flag = true;
-				break;
-			}
-
-			if (maze[nextX][nextY] == 0) continue;
-			else if (mark[nextX][nextY] != 0) continue;
-			
-			mark[nextX][nextY] = 1;
-			m next = { nextX, nextY, nextD };
-			stack[top++] = next;
-		}
-		if (flag == true) break;
-	}
-	
+	bfs();
+	printf("%d\n", cost[row - 1][col - 1]);
+	return 0;
 }

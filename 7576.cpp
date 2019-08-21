@@ -1,112 +1,91 @@
-#include <iostream>
-using namespace std;
+#include <stdio.h>
+#define QUEUE_SIZE 1000005
 
 typedef struct {
 	int x;
 	int y;
-}mv;
+}Loc;
 
-int dirX[4] = { -1 ,0, 1, 0 };
-int dirY[4] = { 0,1,0,-1 };
-int tomato[1001][1001];
-int row, col, front, rear, result = 0;
-int visit[1001][1001];
-mv queue[1000001];
+int row, col, arr[1005][1005];
+Loc queue[QUEUE_SIZE];
+int front, rear;
+int dirX[4] = { -1,0,1,0 }, dirY[4] = { 0,1,0,-1 };
+bool flag;
 
-void push(mv item)
+void push(Loc item)
 {
-	rear = (rear + 1) % 1000001;
+	rear = (rear + 1) % QUEUE_SIZE;
 	queue[rear] = item;
 }
 
-void pop()
+Loc pop()
 {
-	front = (front + 1) % 1000001;
-}
-
-mv getFront()
-{
-	int temp = (front + 1) % 1000001;
-	return queue[temp];
-}
-
-bool checkTomato()
-{
-	for (int i = 0; i < row; i++)
-	{
-		for (int j = 0; j < col; j++)
-		{
-			if (tomato[i][j] == 0) return false;
-		}
-	}
-	return true;
+	front = (front + 1) % QUEUE_SIZE;
+	return queue[front];
 }
 
 int bfs()
 {
-	front = rear = -1;
-	for (int i = 0; i < row; i++)
-	{
-		for (int j = 0; j < col; j++)
-		{
-			if (tomato[i][j] == 1)
-			{
-				push({ i,j });
-				visit[i][j] = 0;
-			}
-			else visit[i][j] = -1;
+	int day = 0;
+	for (register int i = 0; i < row; i++) {
+		for (register int j = 0; j < col; j++) {
+			if(arr[i][j] == 1) push({ i,j });
 		}
 	}
 
-	int nextX, nextY;
-	mv cur;
-	int days = -1;
+	if (front == rear) return 0;
 	while (front != rear)
 	{
-		int size = (rear - front + 1000001) % 1000001;
-		for (register int d = 0; d < size; d++)
-		{
-			cur = getFront();
-			pop();
-
-			for (int i = 0; i < 4; i++)
-			{
-				nextX = cur.x + dirX[i];
-				nextY = cur.y + dirY[i];
+		flag = true;
+		int size = (rear - front + QUEUE_SIZE) % QUEUE_SIZE;
+		day++;
+		for (register int i = 0; i < size; i++) {
+			Loc cur = pop();
+			
+			for (register int j = 0; j < 4; j++) {
+				int nextX = cur.x + dirX[j];
+				int nextY = cur.y + dirY[j];
 
 				if (nextX < 0 || nextY < 0 || nextX >= row || nextY >= col) continue;
+				if (arr[nextX][nextY] != 0) continue;
 
-				if (tomato[nextX][nextY] == 0)
-				{
-					tomato[nextX][nextY] = 1;
-					visit[nextX][nextY] = visit[cur.x][cur.y] + 1;
-					push({ nextX, nextY });
-				}
+				arr[nextX][nextY] = 1;
+				push({ nextX, nextY });
 			}
 		}
-		days++;
-	}
 
-	for (register int i = 0; i < row; i++)
-	{
-		for (register int j = 0; j < col; j++) {
-			if (tomato[i][j] == 0) return -1;
+		for (register int i = 0; i < row; i++) {
+			for (register int j = 0; j < col; j++) {
+				if (arr[i][j] == 0) {
+					flag = false;
+					break;
+				}
+			}
+			if (!flag) break;
 		}
-	}
-	return days;
-}
 
+		if (flag) break;
+	}
+	return day;
+}
 
 int main()
 {
-	cin >> col >> row;
-	for (int i = 0; i < row; i++)
-	{
-		for (int j = 0; j < col; j++) cin >> tomato[i][j];
+	scanf("%d %d", &col, &row);
+	int zeroCnt = 0;
+	for (register int i = 0; i < row; i++) {
+		for (register int j = 0; j < col; j++) {
+			scanf("%d", &arr[i][j]);
+			if (arr[i][j] == 0) zeroCnt++;
+		}
 	}
 
-	result = bfs();
-
-	cout << result << endl;
+	if (zeroCnt == 0) {
+		printf("0\n");
+		return 0;
+	}
+	int res = bfs();
+	if (!flag) res = -1;
+	printf("%d\n", res);
 	return 0;
 }

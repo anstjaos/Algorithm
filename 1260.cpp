@@ -1,86 +1,68 @@
-#include <iostream>
-using namespace std;
+#include <stdio.h>
+#define QUEUE_SIZE 10006
 
-int N, M, start;
-int map[1002][1002];
-int queue[1000002];
-int front, rear;
-bool check[1002];
+int N, M, V, arr[1005][1005];
+int queue[QUEUE_SIZE], front, rear;
+bool visit[1005];
 
-void push(int index)
+void push(int item)
 {
-	rear = (rear + 1) % 1000002;
-	queue[rear] = index;
+	queue[++rear] = item;
 }
 
-void pop()
+int pop()
 {
-	front = (front + 1) % 1000002;
+	return queue[++front];
 }
 
-int getFront()
+void bfs()
 {
-	int temp = (front + 1) % 1000002;
-	return queue[temp];
-}
+	front = rear = -1;
+	push(V);
+	visit[V] = true;
 
-bool isEmpty()
-{
-	if (front == rear) return true;
-	else return false;
-}
-
-void dfs(int start)
-{
-	check[start] = true;
-	cout << start << " ";
-	for (int i = 1; i <= N; i++)
+	while (front != rear)
 	{
-		if (map[start][i] == 1 && check[i] == false)
-		{
-			check[i] = true;
-			dfs(i);
+		int cur = pop();
+		printf("%d ", cur);
+		for (register int i = 1; i <= N; i++) {
+			if (arr[cur][i] == 1 && !visit[i]) {
+				visit[i] = true;
+				push(i);
+			}
 		}
 	}
+	printf("\n");
 }
 
-void bfs(int start)
+void dfs(int cur)
 {
-	push(start);
-	check[start] = true;
-	int cur;
-	while (!isEmpty())
+	visit[cur] = true;
+	printf("%d ", cur);
+	for (register int i = 1; i <= N; i++)
 	{
-		cur = getFront();
-		pop();
-		cout << cur << " ";
-		
-
-		for (int i = 1; i <= N; i++)
-		{
-			if (map[cur][i] == 1 && check[i] == false)
-			{
-				push(i);
-				check[i] = true;
-			}
+		if (arr[cur][i] == 1 && !visit[i]) {
+			visit[i] = true;
+			dfs(i);
 		}
 	}
 }
 
 int main()
 {
-	cin >> N >> M >> start;
-	for (int i = 0; i < M; i++)
-	{
-		int from, to;
-		cin >> from >> to;
-		map[from][to] = 1;
-		map[to][from] = 1;
+	scanf("%d %d %d", &N, &M, &V);
+	int a, b;
+	for (register int i = 0; i < M; i++) {
+		scanf("%d %d", &a, &b);
+		arr[a][b] = 1;
+		arr[b][a] = 1;
 	}
 
-	dfs(start);
-	cout << endl;
-	for (int i = 1; i <= N; i++) check[i] = false;
-	bfs(start);
-	cout << endl;
+	dfs(V);
+	printf("\n");
+	for (register int i = 1; i <= N; i++) visit[i] = false;
+
+	bfs();
+	
+	return 0;
 }

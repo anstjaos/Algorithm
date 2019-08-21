@@ -1,144 +1,114 @@
-#include <iostream>
-using namespace std;
+#include <stdio.h>
+#define QUEUE_SIZE 100005
 
 typedef struct {
-	int x;
+	int x; 
 	int y;
-}mv;
+}Loc;
 
-int N, front, rear;
-mv queue[100001];
-char map[101][101], temp[101][101];
-int result = 0;
-int dirX[4] = { -1,0,1,0 };
-int dirY[4] = { 0,1,0,-1 };
+int N, arr[105][105];
+char map[105][105];
+Loc queue[QUEUE_SIZE];
+int front, rear, dirX[4] = { -1,0,1,0 }, dirY[4] = { 0,1,0,-1 };
+bool visit[105][105];
 
-void push(mv item)
+void push(Loc item)
 {
-	rear = (rear + 1) % 100001;
+	rear = (rear + 1) % QUEUE_SIZE;
 	queue[rear] = item;
 }
 
-void pop()
+Loc pop()
 {
-	front = (front + 1) % 100001;
+	front = (front + 1) % QUEUE_SIZE;
+	return queue[front];
 }
 
-mv getFront()
-{
-	int temp = (front + 1) % 100001;
-	return queue[temp];
-}
-
-void bfsC(int x, int y, char color, char arr[101][101])
+void charBfs(Loc start)
 {
 	front = rear = -1;
-	push({ x,y });
+	visit[start.x][start.y] = true;
+	char c = map[start.x][start.y];
+	push(start);
 
-	mv cur;
 	while (front != rear)
 	{
-		cur = getFront();
-		pop();
-
-		for (int i = 0; i < 4; i++)
+		Loc cur = pop();
+		for (register int i = 0; i < 4; i++)
 		{
 			int nextX = cur.x + dirX[i];
 			int nextY = cur.y + dirY[i];
+			
+			if (nextX < 0 || nextY < 0 || nextX >= N || nextY >= N) continue;
+			if (map[nextX][nextY] != c || visit[nextX][nextY]) continue;
 
-			if (nextX < 0 || nextY < 0 || nextX > N || nextY > N) continue;
-
-			if (color == 'G' || color == 'R')
-			{
-				if (arr[nextX][nextY] == 'G' || arr[nextX][nextY] == 'R')
-				{
-					arr[nextX][nextY] = 'X';
-					push({ nextX,nextY });
-				}
-			}
-			else if (color == 'B')
-			{
-				if (arr[nextX][nextY] == 'B')
-				{
-					arr[nextX][nextY] = 'X';
-					push({ nextX,nextY });
-				}
-			}
+			visit[nextX][nextY] = true;
+			push({ nextX, nextY });
 		}
 	}
-	
 }
 
-void bfs(int x, int y, char color, char arr[101][101])
+void bfs(Loc start)
 {
 	front = rear = -1;
-	push({ x,y });
+	visit[start.x][start.y] = true;
+	int v = arr[start.x][start.y];
+	push(start);
 
-	mv cur;
 	while (front != rear)
 	{
-		cur = getFront();
-		pop();
-
-		for (int i = 0; i < 4; i++)
+		Loc cur = pop();
+		for (register int i = 0; i < 4; i++)
 		{
 			int nextX = cur.x + dirX[i];
 			int nextY = cur.y + dirY[i];
 
-			if (nextX < 0 || nextY < 0 || nextX > N || nextY > N) continue;
+			if (nextX < 0 || nextY < 0 || nextX >= N || nextY >= N) continue;
+			if (arr[nextX][nextY] != v || visit[nextX][nextY]) continue;
 
-			if (color == arr[nextX][nextY] )
-			{
-				
-					arr[nextX][nextY] = 'X';
-					push({ nextX,nextY });
-			
-			}
-			
+			visit[nextX][nextY] = true;
+			push({ nextX, nextY });
 		}
 	}
 }
 
 int main()
 {
-	cin >> N;
-	for (int i = 0; i < N; i++)
+	scanf("%d", &N);
+	for (register int i = 0; i < N; i++)
 	{
-		cin >> map[i];
+		for (register int j = 0; j < N; j++) {
+			scanf(" %c", &map[i][j]);
+
+			if (map[i][j] == 'R' || map[i][j] == 'G') arr[i][j] = 1;
+			else arr[i][j] = 0;
+		}
 	}
 
-
-	for (int i = 0; i < N; i++)
-	{
-		for (int j = 0; j < N; j++) temp[i][j] = map[i][j];
-	}
-
-	for (int i = 0; i < N; i++)
-	{
-		for (int j = 0; j < N; j++)
-		{
-			if (map[i][j] != 'X')
-			{
-				bfs(i, j, map[i][j], map);
-				result++;
+	int cnt = 0;
+	for (register int i = 0; i < N; i++) {
+		for (register int j = 0; j < N; j++) {
+			if (!visit[i][j]) {
+				charBfs({ i,j });
+				cnt++;
 			}
 		}
 	}
-	cout << result << " ";
-	result = 0;
-	
 
-	for (int i = 0; i < N; i++)
-	{
-		for (int j = 0; j < N; j++)
-		{
-			if (temp[i][j] != 'X')
-			{
-				bfsC(i, j, temp[i][j], temp);
-				result++;
+	for (register int i = 0; i < N; i++) {
+		for (register int j = 0; j < N; j++) visit[i][j] = false;
+	}
+
+	printf("%d ", cnt);
+	cnt = 0;
+	for (register int i = 0; i < N; i++) {
+		for (register int j = 0; j < N; j++) {
+			if (!visit[i][j]) {
+				bfs({ i,j });
+				cnt++;
 			}
 		}
 	}
-	cout << result << endl;
+	printf("%d\n", cnt);
 	return 0;
 }
