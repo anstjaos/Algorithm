@@ -1,50 +1,83 @@
-#include <iostream>
-#include <string>
-using namespace std;
+#include <stdio.h>
 
-typedef struct a{
+typedef struct Trie {
+	Trie *arr[10];
 	bool check;
-	a *next[10];
 
-	a()
-	{
+	Trie() {
+		for (register int i = 0; i < 10; i++) arr[i] = 0;
 		check = false;
-		for (int i = 0; i < 10; i++) next[i] = NULL;
 	}
-}tri;
+}Trie;
 
-int testCase, num, top=-1;
-string tell[100001];
-tri* first;
-tri* stack[100001];
+Trie triePool[1000001];
+Trie *head;
+int poolCnt, tc, N;
+char input[10005][12];
 
-tri* getTop() { return stack[top]; }
-
-void push(tri* item)
+int strcmp(const char *s, const char *s1)
 {
-	top++;
-	stack[top] = item;
+	int idx = 0;
+	while (s[idx] == s1[idx])
+	{
+		idx++;
+
+		if (s[idx] == 0) break;
+	}
+
+	return s[idx] - s1[idx];
 }
 
-void pop()
+int strlen(const char *s)
 {
-	top--;
+	int len = 0;
+	while (s[len] != 0) len++;
+	return len;
 }
 
-void quickSort(int left, int right)
+void swap(char *s, char *s1)
+{
+	char temp[12] = { 0, };
+	int idx = 0;
+	while (s[idx] != 0) {
+		temp[idx] = s[idx];
+		idx++;
+	}
+	idx = 0;
+	while (s1[idx] != 0) {
+		s[idx] = s1[idx];
+		idx++;
+	}
+	s[idx] = 0;
+
+	idx = 0;
+	while (temp[idx] != 0) {
+		s1[idx] = temp[idx];
+		idx++;
+	}
+	s1[idx] = 0;
+}
+
+void quickSort(const int left, const int right)
 {
 	int leftIndex = left;
 	int rightIndex = right;
-	string pivot = tell[(left + right) / 2];
+	char *pivot = input[(left + right) / 2];
 
 	while (leftIndex <= rightIndex)
 	{
-		while (tell[leftIndex] < pivot) leftIndex++;
-		while (tell[rightIndex] > pivot) rightIndex--;
+		while (strcmp(input[leftIndex], pivot) < 0) {
+			if (leftIndex == right) break;
+			leftIndex++;
+		}
+		while (strcmp(input[rightIndex], pivot) > 0) {
+			if (rightIndex == left) break;
+			rightIndex--;
+		}
 
 		if (leftIndex <= rightIndex)
 		{
-			swap(tell[leftIndex], tell[rightIndex]);
+			swap(input[leftIndex], input[rightIndex]);
 			leftIndex++;
 			rightIndex--;
 		}
@@ -54,85 +87,54 @@ void quickSort(int left, int right)
 	if (left < rightIndex) quickSort(left, rightIndex);
 }
 
-void deleteTri()
+void init()
 {
-	tri* ptr = first;
-	top = -1;
-	push(ptr);
-
-	while (top == -1)
-	{
-		ptr = getTop();
-
-		for (int i = 0; i < 10; i++)
-		{
-			if (ptr->next[i] != NULL)
-			{
-				push(ptr->next[i]);
-				break;
-			}
-
-			if (i == 9)
-			{
-				delete ptr;
-				pop();
-			}
-		}
+	for (register int i = 0; i < poolCnt; i++) {
+		for (register int j = 0; j < 10; j++) triePool[i].arr[j] = 0;
+		triePool[i].check = false;
 	}
+	head = &triePool[0];
+	poolCnt = 1;
 }
 
 int main()
 {
-	bool flag = true;
-	cin >> testCase;
-	first = new tri();
-
-	while (testCase--)
+	scanf("%d", &tc);
+	for (register int t = 0; t < tc; t++)
 	{
-		flag = true;
-		top = -1;
-		cin >> num;
-		for (int i = 0; i < num; i++) cin >> tell[i];
-		quickSort(0, num - 1);
+		init();
+		scanf("%d", &N);
+		for (register int i = 0; i < N; i++) scanf(" %s", input[i]);
 
-		for (int i = 0; i < num; i++)
+		quickSort(0, N - 1);
+
+		bool check = true;
+		for (register int i = 0; i < N; i++)
 		{
-			int size = tell[i].size();
-			string temp = tell[i];
-			tri* ptr = first;
-
-			for (int j = 0; j < size; j++)
+			int len = strlen(input[i]);
+			Trie *ptr = head;
+			check = true;
+			for (register int j = 0; j < len; j++)
 			{
-				int index = temp[j] - '0';
-				if (ptr->next[index] == NULL) ptr->next[index] = new tri();
-
-				ptr = ptr->next[index];
-				if (ptr->check == true)
-				{
-					flag = false;
+				if (ptr->check == true) {
+					check = false;
 					break;
 				}
+
+				int num = input[i][j] - '0';
+				if (ptr->arr[num] == 0) {
+					ptr->arr[num] = &triePool[poolCnt];
+					poolCnt++;
+				}
+
+				ptr = ptr->arr[num];
 			}
-
-			if (flag == false) break;
 			ptr->check = true;
-			push(ptr);
+			if (!check) break;
 		}
 
-		if (flag == false)
-		{
-			cout << "NO\n";
-		}
-		else cout << "YES\n";
-
-		while (top != -1)
-		{
-			tri* ptr = getTop();
-			ptr->check = false;
-			pop();
-		}
+		if (check) printf("YES\n");
+		else printf("NO\n");
 	}
-
-	deleteTri();
 	return 0;
 }

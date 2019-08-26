@@ -1,17 +1,25 @@
-#include <iostream>
-using namespace std;
-long long a, b, c;
-long long cal(long long a, long long b, long long c)
+#include <stdio.h>
+
+long long A, B, C;
+
+int solve()
 {
-	if (b == 0) { return 1; }
-	else if (b == 1) { return a % c; }
-	else if (b % 2 == 0) { long long tmp = cal(a, b / 2, c); return (tmp*tmp) % c; }
-	else 
-		return (a * cal(a, b - 1, c)) % c;
+	long long res = 1;
+	while (B > 0)
+	{
+		if (B & 1) {
+			res *= A;
+			res = res % C;
+		}
+		A = A * A % C;
+		B >>= 1;
+	}
+	return res;
 }
 
-int main() {
-	cin >> a >> b >> c;
-	cout << cal(a, b, c) << '\n';
+int main()
+{
+	scanf("%lld %lld %lld", &A, &B, &C);
+	printf("%d\n", solve());
 	return 0;
 }

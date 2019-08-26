@@ -1,48 +1,47 @@
-#include <iostream>
-using namespace std;
-long long a[6][6], ans[6][6], c[6][6], n, b;
-void cal(long long a[6][6], long long b[6][6])
+#include <stdio.h>
+
+long long a[6][6], res[6][6], N, B;
+
+void cal(long long b[][6], long long c[][6])
 {
-	for (int i = 1; i <= n; i++)
-		for (int j = 1; j <= n; j++)
-		{
-			c[i][j] = 0;
-			for (int k = 1; k <= n; k++)
-			{
-				c[i][j] += a[i][k] * b[k][j];
+	long long ret[6][6];
+	for (register int i = 0; i < N; i++) {
+		for (register int j = 0; j < N; j++) {
+
+			ret[i][j] = 0;
+			for (register int k = 0; k < N; k++) {
+				ret[i][j] += b[i][k] * c[k][j];
 			}
-			c[i][j] %= 1000;
+			ret[i][j] %= 1000;
 		}
-	for (int i = 1; i <= n; i++)
-		for (int j = 1; j <= n; j++)
-			a[i][j] = c[i][j];
-
-}
-int main() {
-	cin >> n >> b;
-	for (int i = 1; i <= n; i++)
-	{
-		for (int j = 1; j <= n; j++)
-		{
-			cin >> a[i][j];
-
-		}
-		ans[i][i] = 1;
 	}
 
-	while (b > 0)
+	for (register int i = 0; i < N; i++) {
+		for (register int j = 0; j < N; j++) b[i][j] = ret[i][j];
+	}
+}
+
+int main()
+{
+	scanf("%lld %lld", &N, &B);
+	for (register int i = 0; i < N; i++) {
+		for (register int j = 0; j < N; j++) scanf("%lld", &a[i][j]);
+		res[i][i] = 1;
+	}
+
+	while (B > 0)
 	{
-		if (b % 2 == 1)//지수가 홀수면
-		{
-			cal(ans, a);
+		if (B & 1) {
+			cal(res, a);
 		}
 		cal(a, a);
-		b /= 2;
+		B >>= 1;
 	}
-	for (int i = 1; i <= n; i++)
-	{
-		for (int j = 1; j <= n; j++)
-			cout << ans[i][j] << ' ';
-		cout << '\n';
+
+	for (register int i = 0; i < N; i++) {
+		for (register int j = 0; j < N; j++) printf("%lld ", res[i][j]);
+		printf("\n");
 	}
+
+	return 0;
 }
