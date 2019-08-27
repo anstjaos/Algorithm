@@ -6,7 +6,7 @@ typedef struct {
 	int cost;
 }Vertex;
 
-int N, M, map[1001][1001], cost[1005];
+int N, M, map[1001][1001], cost[1005], from[1005];
 Vertex minHeap[1000005];
 int heapSize, start, dest;
 
@@ -37,7 +37,7 @@ Vertex pop()
 	while (1)
 	{
 		if (idx * 2 > heapSize) break;
-		
+
 		if (idx * 2 == heapSize) {
 			child = idx * 2;
 		}
@@ -73,6 +73,7 @@ void dijkstra()
 
 			if (cost[i] > cost[cur.from] + map[cur.from][i]) {
 				cost[i] = cost[cur.from] + map[cur.from][i];
+				from[i] = cur.from;
 				push({ i, cost[i] });
 			}
 		}
@@ -95,5 +96,19 @@ int main()
 	scanf("%d %d", &start, &dest);
 	dijkstra();
 	printf("%d\n", cost[dest]);
+
+	int stack[1005], top = -1, cur = dest;
+	while (1)
+	{
+		if (cur == 0) break;
+		stack[++top] = cur;
+		cur = from[cur];
+	}
+
+	printf("%d\n", top + 1);
+	while (top != -1) {
+		printf("%d ", stack[top--]);
+	}
+	printf("\n");
 	return 0;
 }
