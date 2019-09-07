@@ -1,35 +1,31 @@
-#include <iostream>
-using namespace std;
+#include <stdio.h>
+#define MAX_SIZE 100001
 
-int arr[100001], n, preOrder[100001], postOrder[100001];
-int index = 1;
+int inorder[MAX_SIZE], postOrder[MAX_SIZE], N;
+int idx[MAX_SIZE];
 
-void solve(int curIndex)
+void preOrder(int inBegin, int inEnd, int postBegin, int postEnd)
 {
-	if (curIndex * 2 <= n) solve(curIndex * 2);
-	arr[curIndex] = preOrder[index++];
-	if (curIndex * 2 + 1 <= n) solve(curIndex * 2 + 1);
+	if (inBegin > inEnd || postBegin > postEnd)
+		return;
+
+	int root = postOrder[postEnd];
+	printf("%d ", root);
+
+	preOrder(inBegin, idx[root] - 1, postBegin, postBegin + (idx[root] - inBegin) - 1);
+	preOrder(idx[root] + 1, inEnd, postBegin + (idx[root] - inBegin), postEnd - 1);
 }
 
-void showPreOrder(int curIndex)
+int main(void)
 {
-	cout << arr[curIndex] << " ";
-	if (curIndex * 2 <= n) showPreOrder(curIndex * 2);
-	if (curIndex * 2 + 1 <= n) showPreOrder(curIndex * 2 + 1);
-}
+	scanf("%d", &N);
 
-int main()
-{
-	cin >> n;
+	for (int i = 0; i < N; i++) scanf("%d", inorder + i);
+	for (int i = 0; i < N; i++) scanf("%d", postOrder + i);
+	for (int i = 0; i < N; i++) idx[inorder[i]] = i;
 
-	for (int i = 1; i <= n; i++)
-	{
-		cin >> preOrder[i];
-	}
-	for (int i = 1; i <= n; i++) cin >> postOrder[i];
+	preOrder(0, N - 1, 0, N - 1);
+	printf("\n");
 
-	solve(1);
-	showPreOrder(1);
-	cout << '\n';
 	return 0;
 }
