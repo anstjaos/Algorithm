@@ -6,3 +6,5 @@ Baekjoon.vcxproj.user
 input.txt
 .vs
 2020_*
+.vscode
+*.out
