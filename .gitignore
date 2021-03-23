@@ -9,3 +9,7 @@ input.txt
 .vscode
 *.out
 *.class
+/out
+*.iml
+/.idea
+BOJ/.idea
