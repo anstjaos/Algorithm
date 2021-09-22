@@ -9,6 +9,7 @@ public class BOJ_2960 {
         StringTokenizer st = new StringTokenizer(br.readLine());
         int N = Integer.parseInt(st.nextToken()), K = Integer.parseInt(st.nextToken());
         br.close();
+        
 
         boolean[] isPrime = new boolean[N+1];
         Arrays.fill(isPrime, true);
