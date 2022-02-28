@@ -1,62 +1,70 @@
 import java.io.*;
+import java.util.LinkedList;
+import java.util.Queue;
+import java.util.Stack;
 import java.util.StringTokenizer;
 
 public class BOJ_13913 {
-    private static int[] result, visit;
-    private static int N, K, resultCount;
+    private static int[] parent, visit;
+    private static int N, K;
 
     public static void main(String[] args) throws IOException {
-        // BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        BufferedReader br = new BufferedReader(new FileReader("input.txt"));
+         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+//        BufferedReader br = new BufferedReader(new FileReader("input.txt"));
         StringTokenizer st = new StringTokenizer(br.readLine());
 
         N = Integer.parseInt(st.nextToken());
         K = Integer.parseInt(st.nextToken());
         br.close();
 
-        result = new int[300005];
+        parent = new int[300005];
         visit = new int[300005];
 
-        solve(N, 0);
-        StringBuilder sb = new StringBuilder();
-        sb.append(resultCount).append("\n");
-        for (int i = 0; i < resultCount; i++) {
-            sb.append(result[i]).append(" ");
+        solve();
+
+        Stack<Integer> stack = new Stack<>();
+        stack.push(K);
+        int index = K;
+
+        while (index != N) {
+            stack.push(parent[index]);
+            index = parent[index];
         }
+
+        StringBuilder sb = new StringBuilder();
+        sb.append(visit[K] - 1).append("\n");
+        while (!stack.isEmpty()) {
+            sb.append(stack.pop()).append(" ");
+        }
+
         System.out.println(sb);
     }
 
-    private static boolean solve(int cur, int count) {
-        if (cur == K) {
-            result[count] = K;
-            resultCount = count;
-            return true;
-        }
+    private static void solve() {
+        Queue<Integer> queue = new LinkedList<>();
+        queue.add(N);
+        visit[N] = 1;
 
-        if (cur * 2 < 300005 && (visit[cur * 2] == 0 || visit[cur * 2] > count + 1)) {
-            boolean r = solve(cur * 2, count + 1);
-            if (r) {
-                result[count] = cur;
-                return true;
+        while (!queue.isEmpty()) {
+            int cur = queue.poll();
+
+            if (cur == K) return;
+
+            for (int i = 0; i < 3; i++) {
+                int next = 0;
+
+                if (i == 0) next = cur + 1;
+                else if (i == 1) next = cur - 1;
+                else next = cur * 2;
+
+                if (next < 0 || next > 100000) continue;
+
+                if (visit[next] == 0) {
+                    queue.add(next);
+                    visit[next] = visit[cur] + 1;
+                    parent[next] = cur;
+                }
             }
         }
-
-        if (cur + 1 < K && (visit[cur + 1] == 0 || visit[cur + 1] > count + 1)) {
-            boolean r = solve(cur + 1, count + 1);
-            if (r) {
-                result[count] = cur;
-                return true;
-            }
-        }
-
-        if (cur - 1 >= 0 && (visit[cur - 1] == 0 || visit[cur - 1] > count + 1)) {
-            boolean r = solve(cur - 1, count + 1);
-            if (r) {
-                result[count] = cur;
-                return true;
-            }
-        }
-
-        return false;
     }
 }
