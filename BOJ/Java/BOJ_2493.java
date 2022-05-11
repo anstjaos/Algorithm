@@ -26,7 +26,7 @@ public class BOJ_2493 {
 
             while (!stack.isEmpty()) {
                 int top = stack.peek().height;
-                if (top < cur) stack.pop();
+                if (top <= cur) stack.pop();
                 else break;
             }
 
