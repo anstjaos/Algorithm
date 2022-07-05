@@ -1,3 +1,5 @@
+import java.util.*;
+
 public class lvl1_64061 {
     public int solution(int[][] board, int[] moves) {
         int answer = 0;
