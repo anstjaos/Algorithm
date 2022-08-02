@@ -1,3 +1,5 @@
+import java.util.*;
+
 public class lvl1_42576 {
     public String solution(String[] participant, String[] completion) {
         String answer = "";
