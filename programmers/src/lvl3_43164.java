@@ -9,7 +9,8 @@ public class lvl3_43164 {
         answers = new ArrayList<String>();
         int count = 0;
 
-        dfs(count, "ICN", "ICN", tickets);
+        dfs(count, "ICN", "ICN",
+                tickets);
         Collections.sort(answers);
         String[] answer = answers.get(0).split(" ");
         return answer;
